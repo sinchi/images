@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="dist/cropper.css" />
+	<title>Upload image</title>
+	<style type="text/css">
+	.container {
+      max-width: 640px;
+      margin: 20px auto;
+    }
+		img{
+			max-width: 100%;
+		}
+	</style>
+</head>
+<body>
+
+	<div class="container">
+		<form enctype="multipart/form-data">
+			<input type="file" name="upload" id="upload" />
+			<button id="crop-it">Crop It</button><br/>
+		</form>
+		<textarea id="data" cols="60" rows="5"></textarea>
+		<br/>		
+		<img id="result" />
+	</div>
+	<script type="text/javascript" src="dist/jquery.js"></script>
+	<script type="text/javascript" src="dist/cropper.js"></script>
+	<script type="text/javascript">
+		
+		document.getElementById("upload").onchange = function(event){
+			//event.preventDefault();
+			var image = event.target.files[0];
+			$("#result").attr("src", URL.createObjectURL(image));
+			$("#result").cropper({
+				aspectRatio: 1,				
+				crop: function(e){
+					console.log(e.x);
+					console.log(e.y);
+					console.log(e.width);
+					console.log(e.height);
+					console.log(e.rotate);
+					// console.log(e.scaleX);
+					// console.log(e.scaleY);
+				var json = [
+                  '{"x":' + e.x,
+                  '"y":' + e.y,
+                  '"height":' + e.height,
+                  '"width":' + e.width,
+                  '"rotate":' + e.rotate + '}'
+                ].join();
+           		 $("#data").val(json);
+				}
+			});			
+			
+		}
+
+		document.getElementById("crop-it").onclick = function(e){
+			e.preventDefault();
+			console.log("upload it");
+			var croppedCanvas = $("#result").cropper("getCroppedCanvas");
+			croppedCanvas.toBlob(function(blob){
+				$("#result").attr("src", URL.createObjectURL(blob));				
+			});
+			$("#result").cropper('destroy');
+			//$("#result").remove();
+		}		
+		
+	</script>
+</body>
+</html>
